@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AWBD Music Shop</title>
+    <script src="/webjars/jquery/3.7.1/jquery.min.js"></script>
+    <script src="/webjars/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/webjars/bootstrap/5.3.3/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/webjars/font-awesome/6.5.2/css/all.min.css"/>
+</head>
+<body>
+<div class="container" style="margin-top: 20px">
+    <div class="col-md-6 offset-md-3">
+        <form class="form-signin" id="registerForm">
+            <h2 class="form-signin-heading mb-4">Creează un cont nou</h2>
+            <p id="error" class="text-danger" style="display:none;"></p>
+
+            <div class="form-group mb-3">
+                <label for="username" class="sr-only">Nume utilizator</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Username" required autofocus>
+            </div>
+
+            <div class="form-group mb-4">
+                <label for="password" class="sr-only">Parolă</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+            </div>
+
+            <button class="btn btn-lg btn-primary btn-block w-100" type="submit">Înregistrează-te</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const data = {
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value
+        };
+
+        fetch('/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(res => {
+                if (res.ok) {
+                    window.location.href = "/login";
+                } else {
+                    return res.text().then(text => { throw new Error(text); });
+                }
+            })
+            .catch(err => {
+                const error = document.getElementById('error');
+                error.innerText = "Înregistrare eșuată: " + err.message;
+                error.style.display = 'block';
+            });
+    });
+</script>
+</body>
+</html>
