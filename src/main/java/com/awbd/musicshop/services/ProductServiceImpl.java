@@ -18,11 +18,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class ProductServiceImpl implements ProductService {
 
     ProductRepository productRepository;
     ModelMapper modelMapper;
+
+    private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     public ProductServiceImpl(ProductRepository productRepository, ModelMapper modelMapper) {
         this.productRepository = productRepository;
@@ -31,6 +36,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductDTO> findAll() {
+        logger.info("Retrieving all products.");
         List<Product> products = new LinkedList<>();
         productRepository.findAll(Sort.by("name")).iterator().forEachRemaining(products::add);
 
@@ -41,6 +47,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDTO findById(Long l) {
+        logger.info("Searching for product with id: {}", l);
         Optional<Product> productOptional = productRepository.findById(l);
         if (!productOptional.isPresent()) {
             throw new ResourceNotFoundException("product " + l + " not found");
@@ -50,6 +57,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDTO save(ProductDTO product) {
+        logger.info("Saving product: {}", product.getName());
         Product productToSave = modelMapper.map(product, Product.class);
         productToSave.getInfo().setProduct(productToSave);
         Product savedProduct = productRepository.save(productToSave);
@@ -58,6 +66,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteById(Long id) {
+        logger.warn("Deleting product with id: {}", id);
         productRepository.deleteById(id);
     }
 
