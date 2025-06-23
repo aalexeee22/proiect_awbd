@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Produse</title>
@@ -25,23 +25,13 @@
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{'/categories'}">Categorii</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                     <a class="nav-link btn-primary" th:href="@{'/products/form'}">
                         <i class="fas fa-plus-circle"></i> Vinde
                     </a>
                 </li>
             </ul>
             <ul class="navbar-nav ms-auto topnav">
-                <li class="nav-item">
-                    <a class="nav-link btn-primary" th:href="@{'/login'}">
-                        <i class="fas fa-sign-in-alt"></i> Intră în cont
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link btn-primary" th:href="@{'/participant/form'}">
-                        <i class="fas fa-user-plus"></i> Înregistrează-te
-                    </a>
-                </li>
                 <li class="nav-item">
                     <form id="logout-form" th:action="@{/logout}" method="post">
                         <button type="submit" class="nav-link btn-primary">
@@ -71,8 +61,8 @@
             <td th:text="${product.name}"></td>
             <td th:text="${product.code}"></td>
             <td th:text="${product.reservePrice}">Preț</td>
-            <td><a href="#" th:href="@{'/products/edit/' + ${product.id}}"><i class="fa-solid fa-pen"></i></a></td>
-            <td><a href="#" th:href="@{'/products/delete/' + ${product.id}}"><i class="fa-solid fa-trash"></i></a></td>
+            <td sec:authorize="hasRole('ADMIN')"><a href="#" th:href="@{'/products/edit/' + ${product.id}}"><i class="fa-solid fa-pen"></i></a></td>
+            <td sec:authorize="hasRole('ADMIN')"><a href="#" th:href="@{'/products/delete/' + ${product.id}}"><i class="fa-solid fa-trash"></i></a></td>
         </tr>
 
     </table>

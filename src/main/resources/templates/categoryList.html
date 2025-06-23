@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>AWBD Music Shop</title>
@@ -25,29 +25,20 @@
                 <li class="nav-item">
                     <a class="nav-link active" th:href="@{'/categories'}">Categorii</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                     <a class="nav-link btn-primary" th:href="@{'/products/form'}">
                         <i class="fas fa-plus-circle"></i> Vinde
                     </a>
                 </li>
+
+            </ul>
+            <ul class="navbar-nav ms-auto topnav">
                 <li class="nav-item">
                     <form id="logout-form" th:action="@{/logout}" method="post">
                         <button type="submit" class="nav-link btn-primary">
                             <i class="fas fa-sign-out-alt"></i> Ieși
                         </button>
                     </form>
-                </li>
-            </ul>
-            <ul class="navbar-nav ms-auto topnav">
-                <li class="nav-item">
-                    <a class="nav-link btn-primary" th:href="@{'/login'}">
-                        <i class="fas fa-sign-in-alt"></i> Intră în cont
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link btn-primary" th:href="@{'/participant/form'}">
-                        <i class="fas fa-user-plus"></i> Înregistrează-te
-                    </a>
                 </li>
             </ul>
         </div>
