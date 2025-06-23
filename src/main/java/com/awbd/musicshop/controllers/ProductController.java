@@ -4,16 +4,16 @@ import com.awbd.musicshop.dtos.CategoryDTO;
 import com.awbd.musicshop.dtos.ProductDTO;
 import com.awbd.musicshop.services.CategoryService;
 import com.awbd.musicshop.services.ProductService;
-import jakarta.servlet.http.HttpServletResponse;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
+import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 @Controller
@@ -30,18 +30,26 @@ public class ProductController {
     @RequestMapping("/form")
     public String productForm(Model model) {
         ProductDTO product = new ProductDTO();
-        //product.setSeller(null);
-        model.addAttribute("product",  product);
+        model.addAttribute("product", product);
         List<CategoryDTO> categoriesAll = categoryService.findAll();
-        model.addAttribute("categoriesAll", categoriesAll );
+        model.addAttribute("categoriesAll", categoriesAll);
         return "productForm";
     }
 
+    @GetMapping("")
+    public String productList(@RequestParam(defaultValue = "0") int page,
+                              @RequestParam(defaultValue = "5") int size,
+                              @RequestParam(defaultValue = "id") String sortBy,
+                              Model model) {
 
-    @RequestMapping("")
-    public String productList(Model model) {
-        List<ProductDTO> products = productService.findAll();
-        model.addAttribute("products", products);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+        Page<ProductDTO> productPage = productService.findAllPaged(pageable);
+
+        model.addAttribute("products", productPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", productPage.getTotalPages());
+        model.addAttribute("sortBy", sortBy);
+
         return "productList";
     }
 
@@ -53,58 +61,33 @@ public class ProductController {
             model.addAttribute("product", productDTO);
         } catch (NumberFormatException | com.awbd.musicshop.exceptions.ResourceNotFoundException e) {
             model.addAttribute("exception", e);
-            return "notFoundException"; // this template already exists
+            return "notFoundException";
         }
 
         List<CategoryDTO> categoriesAll = categoryService.findAll();
-        model.addAttribute("categoriesAll", categoriesAll );
+        model.addAttribute("categoriesAll", categoriesAll);
 
         return "productForm";
     }
 
-
-
     @RequestMapping("/delete/{id}")
-    public String deleteById(@PathVariable String id){
+    public String deleteById(@PathVariable String id) {
         productService.deleteById(Long.valueOf(id));
         return "redirect:/products";
     }
 
     @PostMapping("")
-    public String saveOrUpdate(@ModelAttribute ProductDTO product,
-                               @RequestParam("imagefile") MultipartFile file){
-        if (file.isEmpty())
-            productService.save(product);
-        else
-            productService.savePhotoFile(product, file);
+    public String saveOrUpdate(@Valid @ModelAttribute ProductDTO product,
+                               BindingResult bindingResult,
+                               Model model) {
 
-
-        return "redirect:/products" ;
-    }
-
-
-    @GetMapping("/getimage/{id}")
-    public void downloadImage(@PathVariable String id, HttpServletResponse response) throws IOException {
-        ProductDTO productDTO = productService.findById(Long.valueOf(id));
-
-        if (productDTO.getInfo() != null) {
-
-
-            if (productDTO.getInfo().getPhoto() != null) {
-                byte[] byteArray = new byte[productDTO.getInfo().getPhoto().length];
-                int i = 0;
-                for (Byte wrappedByte : productDTO.getInfo().getPhoto()) {
-                    byteArray[i++] = wrappedByte;
-                }
-                response.setContentType("image/jpeg");
-                InputStream is = new ByteArrayInputStream(byteArray);
-                try {
-                    IOUtils.copy(is, response.getOutputStream());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        if (bindingResult.hasErrors()) {
+            List<CategoryDTO> categoriesAll = categoryService.findAll();
+            model.addAttribute("categoriesAll", categoriesAll);
+            return "productForm";
         }
-    }
 
+        productService.save(product);
+        return "redirect:/products";
+    }
 }
