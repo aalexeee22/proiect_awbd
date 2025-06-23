@@ -11,6 +11,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
+
 import java.util.List;
 
 @Setter
@@ -20,8 +25,12 @@ import java.util.List;
 public class ProductDTO {
 
     private Long id;
+    @NotBlank(message = "Numele este obligatoriu")
     private String name;
+    @NotBlank(message = "Codul este obligatoriu")
     private String code;
+    @NotNull(message = "Prețul de rezervă este obligatoriu")
+    @Positive(message = "Prețul de rezervă trebuie să fie mai mare decât 0")
     private Double reservePrice;
     private Boolean restored;
     private Info info=new Info();
