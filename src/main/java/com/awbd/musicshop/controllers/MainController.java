@@ -19,8 +19,8 @@ public class MainController {
     public String showLogInForm(){ return "login"; }
 
     @GetMapping("/register")
-    public String showRegisterForm() {
-        return "register"; // se redă templates/register.html
+    public String showRegisterPage() {
+        return "register";
     }
 
 
