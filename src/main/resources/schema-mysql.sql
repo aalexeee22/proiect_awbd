@@ -40,8 +40,6 @@ CREATE TABLE product (
 
 ALTER TABLE info ADD FOREIGN KEY (product_id) REFERENCES product(id);
 
-ALTER TABLE product ADD FOREIGN KEY (seller_id) REFERENCES participant(id);
-
 CREATE TABLE product_category (
                                   category_id BIGINT,
                                   product_id BIGINT,
